@@ -160,5 +160,21 @@ public class Board : MonoBehaviour
         scoreText.text = "Score: " + score;
     }
 
+    public void ClearBoard()
+    {
+        for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
+            for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
+                tilemap.SetTile(new Vector3Int(x, y, 0), null);
+            }
+        }
+    }
+    public void Restart()
+    {
+        score = 0; 
+        attempts = 3; 
+        UpdateScore(); 
+        ClearBoard();
+    }
+
 
 }
