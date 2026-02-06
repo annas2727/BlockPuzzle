@@ -20,10 +20,10 @@ public class Board : MonoBehaviour
 
     [Header("Settings")]
     public Vector3Int spawnPosition;
-    
+
     [Header("Board Dimensions")]
-    public Vector2Int boardSize = new Vector2Int(8, 8);
-    public Vector2Int boardOrigin = new Vector2Int(0, 0);
+    public Vector3Int boardSize = new Vector3Int(8, 8, 0);
+    public Vector3Int boardOrigin = new Vector3Int(0,0,0);
 
     private void Start()
     {
@@ -72,12 +72,14 @@ public class Board : MonoBehaviour
     {
         foreach (var cell in piece.cells) 
         {
-            Vector3Int tilePosition = cell + position;
+            Vector3Int tilePosition = cell + position + boardSize/2;
 
-            if (tilePosition.x < boardOrigin.x || tilePosition.x >= boardOrigin.x + boardSize.x ||
-                tilePosition.y < boardOrigin.y || tilePosition.y >= boardOrigin.y + boardSize.y) {
-                    Debug.Log ("out of bounds");
-                return false; 
+            bool inX = tilePosition.x >= boardOrigin.x && tilePosition.x < boardOrigin.x + boardSize.x;
+            bool inY = tilePosition.y >= boardOrigin.y && tilePosition.y < boardOrigin.y + boardSize.y;
+
+            if (!inX || !inY) {
+                Debug.Log($"FAILED BOUNDS: Tile {tilePosition} is outside X({boardOrigin.x} to {boardOrigin.x + boardSize.x}) or Y({boardOrigin.y} to {boardOrigin.y + boardSize.y})");
+                return false;
             }
 
             if (tilemap.HasTile(tilePosition)) {
