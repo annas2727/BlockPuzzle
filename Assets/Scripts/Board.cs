@@ -11,7 +11,8 @@ public class Board : MonoBehaviour
     public static int score = 0;
     public static int combo = 0;
     public static int attempts = 3; 
-    public Text scoreText;
+    private Text scoreText;
+    private Text comboText;
     private GameObject light1;
     private GameObject light2;
     private GameObject light3;
@@ -36,6 +37,8 @@ public class Board : MonoBehaviour
         light1 = GameObject.Find("Light1On");
         light2 = GameObject.Find("Light2On");
         light3 = GameObject.Find("Light3On");
+        scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
+        comboText = GameObject.Find("ComboText").GetComponent<Text>();
         SpawnPiece();
     }
 
@@ -154,36 +157,50 @@ public class Board : MonoBehaviour
     public void AddComboScore(int linesCleared)
     {
         //verify combo
-
         if (linesCleared > 0)
         {
+            // RESET: Player cleared a line, give them all attempts back
             attempts = 3;
-        } else {
+            combo++;
+            light1.SetActive(true);
+            light2.SetActive(true);
+            light3.SetActive(true);
+        }
+        else 
+        {
+            // FAIL: Player placed a piece but cleared nothing
             attempts--;
-            if (attempts == 0){
-                combo = 0;
-                attempts = 3; 
-            } else {
-                if (attempts == 2) {
-                    light1.SetActive(false);
-                } else if (attempts == 1) {
-                    light2.SetActive(false);
-                } else if (attempts == 0) {
-                    light3.SetActive(false);
-                }
+            if (attempts == 2) {
+                light1.SetActive(false);
+            } 
+            else if (attempts == 1) {
+                light2.SetActive(false);
+            } 
+            else if (attempts == 0) {
+                // GAME OVER / RESET COMBO
+                light3.SetActive(false);
+                combo = 0;    
+                attempts = 3;
+                light1.SetActive(true);
+                light2.SetActive(true);
+                light3.SetActive(true);            
             }
         }
 
-        Debug.Log("Attempts: " + attempts);
         score += combo * linesCleared * boardSize.x; 
-        combo++;
         UpdateScore();
+        UpdateCombo();
 
     }
 
     public void UpdateScore()
     {
         scoreText.text = "Score: " + score;
+    }
+
+    public void UpdateCombo()
+    {
+        comboText.text = "Combo: x" + combo;
     }
 
     public void ClearBoard()
