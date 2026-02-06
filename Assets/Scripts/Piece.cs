@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 public class Piece : MonoBehaviour
 {
     public Board board { get; private set; }
@@ -21,20 +21,16 @@ public class Piece : MonoBehaviour
         this.board = board;
         this.position = position;
 
-        // 1. Clear any old blocks from a previous spawn
-        foreach (Transform child in transform) {
+        foreach (Transform child in transform) { //clear old blocks
             Destroy(child.gameObject);
         }
 
-        // 2. Map the data cells to our logic array
         this.cells = new Vector3Int[data.cells.Length];
         
-        // 3. Loop through the shape data to draw each sprite
         for (int i = 0; i < data.cells.Length; i++)
         {
             this.cells[i] = (Vector3Int)data.cells[i];
 
-            // Create a new child GameObject for this specific block
             GameObject blockObject = new GameObject("PieceBlock");
             blockObject.transform.SetParent(this.transform);
             
@@ -47,52 +43,70 @@ public class Piece : MonoBehaviour
                 sr.sprite = data.tile.sprite; // Uses the sprite assigned to your Tile asset
             }
             
-            // Ensure it shows up in front of the background
-            sr.sortingOrder = 10; 
+            sr.sortingOrder = 10; //appears in front
         }
 
-        // 4. Move the whole piece to the spawn point
+        // move piece to spawn point
         transform.position = board.tilemap.CellToWorld(position) + board.tilemap.tileAnchor;
         gameObject.SetActive(true);
     }
-    private void OnMouseDown()
+
+   private void Update()
     {
-        isDragging = true;
-        dragOffset = gameObject.transform.position - GetMouseWorldPosition();
+        // Check if the screen was touched or mouse was clicked
+        bool inputStarted = Pointer.current.press.wasPressedThisFrame;
+        bool inputHeld = Pointer.current.press.isPressed;
+        bool inputEnded = Pointer.current.press.wasReleasedThisFrame;
+
+        if (inputStarted) {
+            HandleInputStart();
+        }
+        else if (inputHeld && isDragging) {
+            HandleInputMove();
+        }
+        else if (inputEnded && isDragging) {
+            HandleInputEnd();
+        }
     }
 
-    private void OnMouseDrag()
+    private void HandleInputStart()
     {
-        transform.position = GetMouseWorldPosition() + dragOffset;
+        // Shoot a ray to see if we clicked THIS piece
+        Vector2 mousePos = GetMouseWorldPosition();
+        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+
+        if (hit.collider != null && hit.collider.gameObject == gameObject) {
+            isDragging = true;
+            dragOffset = transform.position - (Vector3)mousePos;
+        }
     }
 
-    private void OnMouseUp()
+    private void HandleInputMove()
     {
-        {
+        transform.position = (Vector3)GetMouseWorldPosition() + dragOffset;
+    }
+
+    private void HandleInputEnd()
+    {
         isDragging = false;
-
         Vector3Int droppedGridPos = board.tilemap.WorldToCell(transform.position);
         
         if (board.IsValidPlacement(this, droppedGridPos)) {
             this.position = droppedGridPos;
-            board.Set(this); // Bake into tilemap
-            gameObject.SetActive(false); 
-            board.SpawnPiece();
+            board.Set(this);
         } else {
-            // Snap back to spawn if placement is invalid
             transform.position = board.tilemap.CellToWorld(board.spawnPosition) + board.tilemap.tileAnchor;
         }
-    }    }
-    
-    private Vector3 GetMouseWorldPosition()
-    {
-        Vector3 mouseScreenPosition = Input.mousePosition;
-        mouseScreenPosition.z = Camera.main.WorldToScreenPoint(transform.position).z;
-
-        return Camera.main.ScreenToWorldPoint(mouseScreenPosition);
     }
 
-
-
+        private Vector3 GetMouseWorldPosition()
+    {
+        // New Input System way to get position
+        Vector2 mousePos = Pointer.current.position.ReadValue();
+        Vector3 mouseScreenPosition = new Vector3(mousePos.x, mousePos.y, 0);
+        
+        mouseScreenPosition.z = mainCamera.WorldToScreenPoint(transform.position).z;
+        return mainCamera.ScreenToWorldPoint(mouseScreenPosition);
+    }
 
 }
