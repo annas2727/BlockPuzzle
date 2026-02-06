@@ -12,6 +12,9 @@ public class Board : MonoBehaviour
     public static int combo = 0;
     public static int attempts = 3; 
     public Text scoreText;
+    private GameObject light1;
+    private GameObject light2;
+    private GameObject light3;
 
     public Tilemap tilemap { get; private set; }
     
@@ -30,6 +33,9 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
+        light1 = GameObject.Find("Light1On");
+        light2 = GameObject.Find("Light2On");
+        light3 = GameObject.Find("Light3On");
         SpawnPiece();
     }
 
@@ -122,15 +128,15 @@ public class Board : MonoBehaviour
         List<int> fullCols = new List<int>();
 
         //get rows
-        for (int y = boardOrigin.y; y < boardOrigin.y + boardSize.y; y++) {
+        for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
             if (IsRowFull(y)) fullRows.Add(y);
         }
 
         //get columns
-        for (int x = boardOrigin.x; x < boardOrigin.x + boardSize.x; x++) {
+        for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
             if (IsColumnFull(x)) fullCols.Add(x);
         }
-
+        
         //clear rows
         foreach (int y in fullRows) {
             for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++)
@@ -147,9 +153,29 @@ public class Board : MonoBehaviour
     }
     public void AddComboScore(int linesCleared)
     {
-        //fix
-        Debug.Log("Score: " + score);
-        score += combo * linesCleared * 8; 
+        //verify combo
+
+        if (linesCleared > 0)
+        {
+            attempts = 3;
+        } else {
+            attempts--;
+            if (attempts == 0){
+                combo = 0;
+                attempts = 3; 
+            } else {
+                if (attempts == 2) {
+                    light1.SetActive(false);
+                } else if (attempts == 1) {
+                    light2.SetActive(false);
+                } else if (attempts == 0) {
+                    light3.SetActive(false);
+                }
+            }
+        }
+
+        Debug.Log("Attempts: " + attempts);
+        score += combo * linesCleared * boardSize.x; 
         combo++;
         UpdateScore();
 
@@ -174,6 +200,9 @@ public class Board : MonoBehaviour
         attempts = 3; 
         UpdateScore(); 
         ClearBoard();
+        light1.SetActive(true);
+        light2.SetActive(true);
+        light3.SetActive(true);
     }
 
 
