@@ -1,9 +1,7 @@
 using UnityEngine;
-
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using System.Collections.Generic;
-
 
 
 public class Board : MonoBehaviour
@@ -17,7 +15,7 @@ public class Board : MonoBehaviour
     private GameObject light2;
     private GameObject light3;
 
-    public Tilemap tilemap { get; private set; }
+    public Tilemap tilemap { get; set; }
     
 
 [Header("References")]
@@ -86,7 +84,7 @@ public class Board : MonoBehaviour
         foreach (var cell in piece.cells) 
         {
             Vector3Int tilePosition = cell + position + boardSize/2;
-
+            //checks if it in bounds of board
             bool inX = tilePosition.x >= boardOrigin.x && tilePosition.x < boardOrigin.x + boardSize.x;
             bool inY = tilePosition.y >= boardOrigin.y && tilePosition.y < boardOrigin.y + boardSize.y;
 
@@ -96,6 +94,7 @@ public class Board : MonoBehaviour
             }
 
             if (tilemap.HasTile(tilePosition)) {
+                Debug.Log("Tile here");
                 return false; 
             }
         }
@@ -200,7 +199,7 @@ public class Board : MonoBehaviour
 
     public void UpdateCombo()
     {
-        comboText.text = "Combo: x" + combo;
+        comboText.text = "Combo: \nx" + combo;
     }
 
     public void ClearBoard()
