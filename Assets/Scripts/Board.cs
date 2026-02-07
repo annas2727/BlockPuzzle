@@ -3,20 +3,18 @@ using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-
 public class Board : MonoBehaviour
 {
     public static int score = 0;
     public static int combo = 0;
     public static int attempts = 3; 
-    private Text scoreText;
-    private Text comboText;
-    private GameObject light1;
-    private GameObject light2;
-    private GameObject light3;
-
+    Text scoreText;
+    Text comboText;
+    GameObject light1;
+    GameObject light2;
+    GameObject light3;
     public Tilemap tilemap { get; set; }
-    
+    bool[,] IsOccupied = new bool[8, 8];
 
 [Header("References")]
     public Piece piecePrefab; 
@@ -41,14 +39,13 @@ public class Board : MonoBehaviour
     }
 
     private void Awake()
-{
-    tilemap = GetComponentInChildren<Tilemap>();
-    
-
-    for (int i = 0; i < puzzleShapeData.Length; i++) {
-        puzzleShapeData[i].Initialize();
+    {
+        tilemap = GetComponentInChildren<Tilemap>();
+        
+        for (int i = 0; i < puzzleShapeData.Length; i++) {
+            puzzleShapeData[i].Initialize();
+        }
     }
-}
 
     public void SpawnPiece()
     {
@@ -61,9 +58,8 @@ public class Board : MonoBehaviour
         int random = Random.Range(0, this.puzzleShapeData.Length);
         PuzzleShapeData data = this.puzzleShapeData[random];  
                 
-        this.activeInstance.Initialize(this, spawnPosition, data);
+        activeInstance.Initialize(this, spawnPosition, data);
     }
-
 
     public void Set(Piece piece)
     {
@@ -71,7 +67,10 @@ public class Board : MonoBehaviour
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             tilemap.SetTile(tilePosition, piece.data.tile);
+            Debug.Log ("tile position: " + tilePosition);
+            IsOccupied[tilePosition.x + boardSize.x/2, tilePosition.y + boardSize.y/2] = true;
         }
+
 
         score += piece.cells.Length;
         UpdateScore();
@@ -81,9 +80,10 @@ public class Board : MonoBehaviour
 
     public bool IsValidPlacement(Piece piece, Vector3Int position)
     {
-        foreach (var cell in piece.cells) 
+        foreach (Vector3Int cell in piece.cells) 
         {
             Vector3Int tilePosition = cell + position + boardSize/2;
+            
             //checks if it in bounds of board
             bool inX = tilePosition.x >= boardOrigin.x && tilePosition.x < boardOrigin.x + boardSize.x;
             bool inY = tilePosition.y >= boardOrigin.y && tilePosition.y < boardOrigin.y + boardSize.y;
@@ -92,11 +92,13 @@ public class Board : MonoBehaviour
                 Debug.Log($"FAILED BOUNDS: Tile {tilePosition} is outside X({boardOrigin.x} to {boardOrigin.x + boardSize.x}) or Y({boardOrigin.y} to {boardOrigin.y + boardSize.y})");
                 return false;
             }
-
-            if (tilemap.HasTile(tilePosition)) {
-                Debug.Log("Tile here");
-                return false; 
+            
+            if (IsOccupied[tilePosition.x, tilePosition.y]) {
+                Debug.Log("failed placement - overlap");
+                return false;
             }
+            Debug.Log("Placement is VALID");
+
         }
         return true;
     }
@@ -189,7 +191,6 @@ public class Board : MonoBehaviour
         score += combo * linesCleared * boardSize.x; 
         UpdateScore();
         UpdateCombo();
-
     }
 
     public void UpdateScore()
@@ -210,6 +211,7 @@ public class Board : MonoBehaviour
             }
         }
     }
+
     public void Restart()
     {
         score = 0; 
@@ -220,6 +222,4 @@ public class Board : MonoBehaviour
         light2.SetActive(true);
         light3.SetActive(true);
     }
-
-
 }

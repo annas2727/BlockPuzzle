@@ -25,11 +25,11 @@ public class Piece : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        this.cells = new Vector3Int[data.cells.Length];
+        cells = new Vector3Int[data.cells.Length];
         
         for (int i = 0; i < data.cells.Length; i++)
         {
-            this.cells[i] = (Vector3Int)data.cells[i];
+            cells[i] = (Vector3Int)data.cells[i];
 
             GameObject blockObject = new GameObject("PieceBlock");
             blockObject.transform.SetParent(this.transform);
@@ -92,22 +92,18 @@ public class Piece : MonoBehaviour
         Vector3Int droppedGridPos = board.tilemap.WorldToCell(transform.position);
         
         if (board.IsValidPlacement(this, droppedGridPos)) {
-            this.position = droppedGridPos;
+            position = droppedGridPos;
             board.Set(this);
         } else {
             transform.position = board.tilemap.CellToWorld(board.spawnPosition) + board.tilemap.tileAnchor;
         }
     }
 
-
-
-        private Vector3 GetMouseWorldPosition()
+    private Vector3 GetMouseWorldPosition()
     {
-        // New Input System way to get position
         Vector2 mousePos = Pointer.current.position.ReadValue();
-        Vector3 mouseScreenPosition = new Vector3(mousePos.x, mousePos.y, 0);
+        Vector3 mouseScreenPosition = new Vector3(mousePos.x, mousePos.y, mainCamera.WorldToScreenPoint(transform.position).z);
         
-        mouseScreenPosition.z = mainCamera.WorldToScreenPoint(transform.position).z;
         return mainCamera.ScreenToWorldPoint(mouseScreenPosition);
     }
 
