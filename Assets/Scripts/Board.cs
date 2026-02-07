@@ -143,14 +143,18 @@ public class Board : MonoBehaviour
         
         //clear rows
         foreach (int y in fullRows) {
-            for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++)
+            for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
                 tilemap.SetTile(new Vector3Int(x, y, 0), null);
+                IsOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
+            }
         }
 
         //clear columns
         foreach (int x in fullCols) {
-            for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++)
+            for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
                 tilemap.SetTile(new Vector3Int(x, y, 0), null);
+                IsOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
+            }
         }
 
         AddComboScore(fullRows.Count + fullCols.Count);
@@ -158,7 +162,7 @@ public class Board : MonoBehaviour
     public void AddComboScore(int linesCleared)
     {
         //verify combo
-        if (linesCleared > 0)
+        if (linesCleared > 0 && combo > 0)
         {
             // RESET: Player cleared a line, give them all attempts back
             attempts = 3;
@@ -208,6 +212,7 @@ public class Board : MonoBehaviour
         for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
             for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
                 tilemap.SetTile(new Vector3Int(x, y, 0), null);
+                IsOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
             }
         }
     }
