@@ -101,7 +101,7 @@ public class Piece : MonoBehaviour
             position = droppedGridPos;
             board.Set(this);
         } else {
-            transform.position = board.tilemap.CellToWorld(board.activeSpawnPosition) + board.tilemap.tileAnchor;
+            transform.position = board.tilemap.CellToWorld(spawnPosition) + board.tilemap.tileAnchor;
         }
     }
 

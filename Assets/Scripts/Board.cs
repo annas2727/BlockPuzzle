@@ -16,6 +16,7 @@ public class Board : MonoBehaviour
     public Tilemap tilemap { get; set; }
     bool[,] IsOccupied = new bool[8, 8];
 
+
 [Header("References")]
     public Piece piecePrefab; 
     private Piece activeInstance;
@@ -25,7 +26,7 @@ public class Board : MonoBehaviour
     Vector3Int spawnPosition1 = new Vector3Int(-4,-9,0);
     Vector3Int spawnPosition2 = new Vector3Int(0,-7,0);
     Vector3Int spawnPosition3 = new Vector3Int(4,-9,0);
-    public Vector3Int activeSpawnPosition;
+    int piecesOnBoard = 3; 
 
     [Header("Board Dimensions")]
     public Vector3Int boardSize = new Vector3Int(8, 8, 0);
@@ -84,11 +85,18 @@ public class Board : MonoBehaviour
 
         Destroy(piece.gameObject); 
         activeInstance = null;
+        piecesOnBoard--;
 
         score += piece.cells.Length;
         UpdateScore();
         ProcessLines();
-        SpawnPiece(piece.spawnPosition);
+        if (piecesOnBoard == 0)
+        {
+            SpawnPiece(spawnPosition1);
+            SpawnPiece(spawnPosition2);
+            SpawnPiece(spawnPosition3);
+            piecesOnBoard = 3;
+        }
     }
 
     public bool IsValidPlacement(Piece piece, Vector3Int position)
