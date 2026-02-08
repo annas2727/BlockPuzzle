@@ -5,6 +5,7 @@ public class Piece : MonoBehaviour
     public Board board { get; private set; }
     public PuzzleShapeData data { get; private set; }
     public Vector3Int position { get; private set; }   
+    public Vector3Int spawnPosition {get; set; }
     public Vector3Int[] cells { get; private set; }
     public Vector3 dragOffset;
     private Camera mainCamera;
@@ -100,7 +101,7 @@ public class Piece : MonoBehaviour
             position = droppedGridPos;
             board.Set(this);
         } else {
-            transform.position = board.tilemap.CellToWorld(board.spawnPosition) + board.tilemap.tileAnchor;
+            transform.position = board.tilemap.CellToWorld(board.activeSpawnPosition) + board.tilemap.tileAnchor;
         }
     }
 

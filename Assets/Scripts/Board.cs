@@ -22,7 +22,10 @@ public class Board : MonoBehaviour
     public PuzzleShapeData[] puzzleShapeData;
 
     [Header("Settings")]
-    public Vector3Int spawnPosition;
+    Vector3Int spawnPosition1 = new Vector3Int(-4,-9,0);
+    Vector3Int spawnPosition2 = new Vector3Int(0,-7,0);
+    Vector3Int spawnPosition3 = new Vector3Int(4,-9,0);
+    public Vector3Int activeSpawnPosition;
 
     [Header("Board Dimensions")]
     public Vector3Int boardSize = new Vector3Int(8, 8, 0);
@@ -40,7 +43,9 @@ public class Board : MonoBehaviour
 
         scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
-        SpawnPiece();
+        SpawnPiece(spawnPosition1);
+        SpawnPiece(spawnPosition2);
+        SpawnPiece(spawnPosition3);
     }
 
     private void Awake()
@@ -52,7 +57,7 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void SpawnPiece()
+    public void SpawnPiece(Vector3Int sp)
     {
         activeInstance = Instantiate(piecePrefab);
     
@@ -63,7 +68,9 @@ public class Board : MonoBehaviour
         int randomRotation = angles[Random.Range(0, angles.Length)];
         
         activeInstance.transform.rotation = Quaternion.Euler(0,0,randomRotation);
-        activeInstance.Initialize(this, spawnPosition, data);
+        activeInstance.Initialize(this, sp, data);
+        
+        activeInstance.spawnPosition = sp;
     }
 
     public void Set(Piece piece)
@@ -81,7 +88,7 @@ public class Board : MonoBehaviour
         score += piece.cells.Length;
         UpdateScore();
         ProcessLines();
-        SpawnPiece();
+        SpawnPiece(piece.spawnPosition);
     }
 
     public bool IsValidPlacement(Piece piece, Vector3Int position)
