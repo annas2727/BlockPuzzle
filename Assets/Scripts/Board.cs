@@ -10,6 +10,7 @@ public class Board : MonoBehaviour
     public static int attempts = 3; 
     Text scoreText;
     Text comboText;
+    Text scorePopupText;
     GameObject light1;
     GameObject light2;
     GameObject light3;
@@ -44,6 +45,9 @@ public class Board : MonoBehaviour
 
         scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
+        scorePopupText = GameObject.Find("ScorePopupText").GetComponent<Text>();
+        scorePopupText.gameObject.SetActive(false);
+
         SpawnPiece(spawnPosition1);
         SpawnPiece(spawnPosition2);
         SpawnPiece(spawnPosition3);
@@ -83,13 +87,13 @@ public class Board : MonoBehaviour
             IsOccupied[tilePosition.x + boardSize.x/2, tilePosition.y + boardSize.y/2] = true;
         }
 
+        int linesCleared = ProcessLines();
+        UpdateScore(piece.cells.Length, linesCleared, piece.position);
+
         Destroy(piece.gameObject); 
         activeInstance = null;
         piecesOnBoard--;
 
-        score += piece.cells.Length;
-        UpdateScore();
-        ProcessLines();
         if (piecesOnBoard == 0)
         {
             SpawnPiece(spawnPosition1);
@@ -147,7 +151,7 @@ public class Board : MonoBehaviour
     }
 
 
-    public void ProcessLines()
+    public int ProcessLines()
     {
         List<int> fullRows = new List<int>();
         List<int> fullCols = new List<int>();
@@ -177,10 +181,29 @@ public class Board : MonoBehaviour
                 IsOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
             }
         }
-
-        AddComboScore(fullRows.Count + fullCols.Count);
+        return fullRows.Count + fullCols.Count; 
     }
-    public void AddComboScore(int linesCleared)
+
+    public void UpdateScore(int tileScore, int linesCleared, Vector3Int position)
+    { 
+        int turnScore = combo * linesCleared * boardSize.x;
+        turnScore += tileScore;
+        UpdateComboLights(linesCleared, position);
+        score += turnScore;
+
+        Vector3 worldPos = tilemap.CellToWorld(position);
+        Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+
+
+        scoreText.text = "Score: " + score;
+        scorePopupText.gameObject.SetActive(true);
+        scorePopupText.text = score.ToString();
+        scorePopupText.transform.position = screenPos;
+        CancelInvoke("HidePopup");
+        Invoke("HidePopup", 1.0f);
+    }
+
+    public void UpdateComboLights(int linesCleared, Vector3Int tilePosition)
     {
         //verify combo
         if (linesCleared > 0)
@@ -210,19 +233,13 @@ public class Board : MonoBehaviour
             }
         }
 
-        score += combo * linesCleared * boardSize.x; 
-        UpdateScore();
-        UpdateCombo();
-    }
-
-    public void UpdateScore()
-    {
-        scoreText.text = "Score: " + score;
-    }
-
-    public void UpdateCombo()
-    {
         comboText.text = "Combo: \nx" + combo;
+
+    }
+
+    private void HidePopup()
+    {
+        scorePopupText.gameObject.SetActive(false);
     }
 
     public void ClearBoard()
@@ -239,7 +256,7 @@ public class Board : MonoBehaviour
     {
         score = 0; 
         attempts = 3; 
-        UpdateScore(); 
+        UpdateScore(0, 0, new Vector3Int(0, 0, 0));
         ClearBoard();
         light1.SetActive(true);
         light2.SetActive(true);
