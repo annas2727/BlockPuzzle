@@ -186,21 +186,25 @@ public class Board : MonoBehaviour
 
     public void UpdateScore(int tileScore, int linesCleared, Vector3Int position)
     { 
-        int turnScore = combo * linesCleared * boardSize.x;
-        turnScore += tileScore;
         UpdateComboLights(linesCleared, position);
+        int turnScore = (combo * linesCleared * boardSize.x) + tileScore;
         score += turnScore;
+        Debug.Log("turn score: " + turnScore);
 
         Vector3 worldPos = tilemap.CellToWorld(position);
         Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
 
-
         scoreText.text = "Score: " + score;
-        scorePopupText.gameObject.SetActive(true);
-        scorePopupText.text = score.ToString();
-        scorePopupText.transform.position = screenPos;
-        CancelInvoke("HidePopup");
-        Invoke("HidePopup", 1.0f);
+        
+        if (turnScore > 0) {
+            scorePopupText.gameObject.SetActive(true);
+            scorePopupText.text = turnScore.ToString();
+            scorePopupText.transform.position = screenPos;
+            CancelInvoke("HidePopup");
+            Invoke("HidePopup", 1.0f);
+        }
+
+       
     }
 
     public void UpdateComboLights(int linesCleared, Vector3Int tilePosition)
