@@ -3,6 +3,20 @@ using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+/* TO DO 
+gray out if pieces dont fit
+piece weights
+background music 
+connect home screen
+sound effects?
+expand touch boundary on pieces
+add animations (combo), make text bigger
+shadows
+apply for unity research position
+create themes
+add sprites to code
+*/
+
 public class Board : MonoBehaviour
 {
     public static int score = 0;
@@ -15,8 +29,8 @@ public class Board : MonoBehaviour
     GameObject light2;
     GameObject light3;
     public Tilemap tilemap { get; set; }
-    bool[,] IsOccupied = new bool[8, 8];
-
+    bool[,] isOccupied = new bool[8, 8];
+    public Sprite[] tileSprites = new Sprite[6];
 
 [Header("References")]
     public Piece piecePrefab; 
@@ -35,6 +49,13 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
+        tileSprites[0] = Resources.Load<Sprite>("2_0");
+        tileSprites[1] = Resources.Load<Sprite>("3_0");
+        tileSprites[2] = Resources.Load<Sprite>("4_0");
+        tileSprites[3] = Resources.Load<Sprite>("5_0");
+        tileSprites[4] = Resources.Load<Sprite>("6_0");
+        //tileSprites[5] = Resources.Load<Sprite>("Shadow_0");
+
         light1 = GameObject.Find("Light1On");
         light2 = GameObject.Find("Light2On");
         light3 = GameObject.Find("Light3On");
@@ -47,11 +68,12 @@ public class Board : MonoBehaviour
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
         scorePopupText = GameObject.Find("ScorePopupText").GetComponent<Text>();
         scorePopupText.gameObject.SetActive(false);
-
+        
         SpawnPiece(spawnPosition1);
         SpawnPiece(spawnPosition2);
         SpawnPiece(spawnPosition3);
     }
+
 
     private void Awake()
     {
@@ -62,20 +84,22 @@ public class Board : MonoBehaviour
         }
     }
 
-    public void SpawnPiece(Vector3Int sp)
+    public void SpawnPiece(Vector3Int spawnPosition)
     {
         activeInstance = Instantiate(piecePrefab);
     
-        int random = Random.Range(0, this.puzzleShapeData.Length);
-        PuzzleShapeData data = this.puzzleShapeData[random];  
+        int randomShape = Random.Range(0, this.puzzleShapeData.Length);
+        PuzzleShapeData data = this.puzzleShapeData[randomShape];  
                 
+        Sprite selectedSprite = tileSprites[Random.Range(0, tileSprites.Length-1)];
+        
         int[] angles = { 0, 90, 180, 270 };
         int randomRotation = angles[Random.Range(0, angles.Length)];
         
         activeInstance.transform.rotation = Quaternion.Euler(0,0,randomRotation);
-        activeInstance.Initialize(this, sp, data);
+        activeInstance.Initialize(this, spawnPosition, data);
         
-        activeInstance.spawnPosition = sp;
+        activeInstance.spawnPosition = spawnPosition;
     }
 
     public void Set(Piece piece)
@@ -84,7 +108,7 @@ public class Board : MonoBehaviour
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             tilemap.SetTile(tilePosition, piece.data.tile);
-            IsOccupied[tilePosition.x + boardSize.x/2, tilePosition.y + boardSize.y/2] = true;
+            isOccupied[tilePosition.x + boardSize.x/2, tilePosition.y + boardSize.y/2] = true;
         }
 
         int linesCleared = ProcessLines();
@@ -118,7 +142,7 @@ public class Board : MonoBehaviour
                 return false;
             }
             
-            if (IsOccupied[tilePosition.x, tilePosition.y]) {
+            if (isOccupied[tilePosition.x, tilePosition.y]) {
                 Debug.Log("failed placement - overlap");
                 return false;
             }
@@ -170,7 +194,7 @@ public class Board : MonoBehaviour
         foreach (int y in fullRows) {
             for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
                 tilemap.SetTile(new Vector3Int(x, y, 0), null);
-                IsOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
+                isOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
             }
         }
 
@@ -178,7 +202,7 @@ public class Board : MonoBehaviour
         foreach (int x in fullCols) {
             for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
                 tilemap.SetTile(new Vector3Int(x, y, 0), null);
-                IsOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
+                isOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
             }
         }
         return fullRows.Count + fullCols.Count; 
@@ -251,7 +275,7 @@ public class Board : MonoBehaviour
         for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
             for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
                 tilemap.SetTile(new Vector3Int(x, y, 0), null);
-                IsOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
+                isOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
             }
         }
     }

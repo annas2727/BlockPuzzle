@@ -41,6 +41,8 @@ public class Piece : MonoBehaviour
         blockObject.transform.rotation = Quaternion.identity; 
 
         SpriteRenderer sr = blockObject.AddComponent<SpriteRenderer>();
+
+        //sr.sprite = sprite;
         if (data.tile != null) {
             sr.sprite = data.tile.sprite;
         }
