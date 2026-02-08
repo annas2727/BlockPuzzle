@@ -868,32 +868,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4db1cd62a3fe892428ebce943d37dcb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Board
+  tileSprites:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   piecePrefab: {fileID: 8262568706411486331, guid: 97c3a4f5b2e8f554dad401be7e4d1414, type: 3}
   puzzleShapeData:
   - shape: 0
     tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 1
-    tile: {fileID: 11400000, guid: 22113b3db21449d488ceceaba241c98a, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 2
-    tile: {fileID: 11400000, guid: 203cdbebe745b0e40bd467dcad2eef9e, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 3
-    tile: {fileID: 11400000, guid: 76d2e61a69dd96a40833011bc2ebcbda, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 4
-    tile: {fileID: 11400000, guid: 87165cb1f0c43fb4792ff07c5afb5f5b, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 5
-    tile: {fileID: 11400000, guid: 87165cb1f0c43fb4792ff07c5afb5f5b, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 6
-    tile: {fileID: 11400000, guid: 76d2e61a69dd96a40833011bc2ebcbda, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 7
-    tile: {fileID: 11400000, guid: 22113b3db21449d488ceceaba241c98a, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 8
     tile: {fileID: 11400000, guid: 87165cb1f0c43fb4792ff07c5afb5f5b, type: 2}
   - shape: 8
-    tile: {fileID: 11400000, guid: 87165cb1f0c43fb4792ff07c5afb5f5b, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 11
-    tile: {fileID: 11400000, guid: 87165cb1f0c43fb4792ff07c5afb5f5b, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   - shape: 10
-    tile: {fileID: 11400000, guid: 87165cb1f0c43fb4792ff07c5afb5f5b, type: 2}
+    tile: {fileID: 11400000, guid: c83fbc115fbb7c64dade84289e44def3, type: 2}
   boardSize: {x: 8, y: 8, z: 0}
   boardOrigin: {x: 0, y: 0, z: 0}
 --- !u!156049354 &675442206

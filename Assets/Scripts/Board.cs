@@ -49,12 +49,6 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
-        tileSprites[0] = Resources.Load<Sprite>("2_0");
-        tileSprites[1] = Resources.Load<Sprite>("3_0");
-        tileSprites[2] = Resources.Load<Sprite>("4_0");
-        tileSprites[3] = Resources.Load<Sprite>("5_0");
-        tileSprites[4] = Resources.Load<Sprite>("6_0");
-        //tileSprites[5] = Resources.Load<Sprite>("Shadow_0");
 
         light1 = GameObject.Find("Light1On");
         light2 = GameObject.Find("Light2On");
@@ -97,7 +91,7 @@ public class Board : MonoBehaviour
         int randomRotation = angles[Random.Range(0, angles.Length)];
         
         activeInstance.transform.rotation = Quaternion.Euler(0,0,randomRotation);
-        activeInstance.Initialize(this, spawnPosition, data);
+        activeInstance.Initialize(this, spawnPosition, data, selectedSprite);
         
         activeInstance.spawnPosition = spawnPosition;
     }
@@ -107,7 +101,11 @@ public class Board : MonoBehaviour
         for (int i = 0; i < piece.cells.Length; i++) //bake tile into grid
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
-            tilemap.SetTile(tilePosition, piece.data.tile);
+            Tile newTile = ScriptableObject.CreateInstance<Tile>();
+            newTile.sprite = piece.pieceSprite;
+            newTile.color = Color.white;
+
+            tilemap.SetTile(tilePosition, newTile);
             isOccupied[tilePosition.x + boardSize.x/2, tilePosition.y + boardSize.y/2] = true;
         }
 

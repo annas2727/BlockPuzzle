@@ -7,6 +7,7 @@ public class Piece : MonoBehaviour
     public Vector3Int position { get; private set; }   
     public Vector3Int spawnPosition {get; set; }
     public Vector3Int[] cells { get; private set; }
+    public Sprite pieceSprite { get; private set; }
     public Vector3 dragOffset;
     private Camera mainCamera;
     private bool isDragging = false;
@@ -16,11 +17,12 @@ public class Piece : MonoBehaviour
         mainCamera = Camera.main;
     }
 
-   public void Initialize(Board board, Vector3Int position, PuzzleShapeData data)
+   public void Initialize(Board board, Vector3Int position, PuzzleShapeData data, Sprite randomSprite)
 {
     this.data = data;
     this.board = board;
     this.position = position;
+    this.pieceSprite = randomSprite;
 
     foreach (Transform child in transform) { 
         Destroy(child.gameObject);
@@ -43,9 +45,8 @@ public class Piece : MonoBehaviour
         SpriteRenderer sr = blockObject.AddComponent<SpriteRenderer>();
 
         //sr.sprite = sprite;
-        if (data.tile != null) {
-            sr.sprite = data.tile.sprite;
-        }
+        sr.sprite = randomSprite;
+
         sr.sortingOrder = 10;
 
         Vector3 rotatedPoint = rotation * localPos;
