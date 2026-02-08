@@ -33,6 +33,11 @@ public class Board : MonoBehaviour
         light1 = GameObject.Find("Light1On");
         light2 = GameObject.Find("Light2On");
         light3 = GameObject.Find("Light3On");
+
+        light1.SetActive(false);
+        light2.SetActive(false);
+        light3.SetActive(false);
+
         scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
         SpawnPiece();
@@ -49,15 +54,15 @@ public class Board : MonoBehaviour
 
     public void SpawnPiece()
     {
-        if (activeInstance == null) {
-            activeInstance = Instantiate(piecePrefab);
-        }
-
-        activeInstance.gameObject.SetActive(true);
-        
+        activeInstance = Instantiate(piecePrefab);
+    
         int random = Random.Range(0, this.puzzleShapeData.Length);
         PuzzleShapeData data = this.puzzleShapeData[random];  
                 
+        int[] angles = { 0, 90, 180, 270 };
+        int randomRotation = angles[Random.Range(0, angles.Length)];
+        
+        activeInstance.transform.rotation = Quaternion.Euler(0,0,randomRotation);
         activeInstance.Initialize(this, spawnPosition, data);
     }
 
@@ -67,10 +72,11 @@ public class Board : MonoBehaviour
         {
             Vector3Int tilePosition = piece.cells[i] + piece.position;
             tilemap.SetTile(tilePosition, piece.data.tile);
-            Debug.Log ("tile position: " + tilePosition);
             IsOccupied[tilePosition.x + boardSize.x/2, tilePosition.y + boardSize.y/2] = true;
         }
 
+        Destroy(piece.gameObject); 
+        activeInstance = null;
 
         score += piece.cells.Length;
         UpdateScore();
@@ -162,7 +168,7 @@ public class Board : MonoBehaviour
     public void AddComboScore(int linesCleared)
     {
         //verify combo
-        if (linesCleared > 0 && combo > 0)
+        if (linesCleared > 0)
         {
             // RESET: Player cleared a line, give them all attempts back
             attempts = 3;
@@ -181,14 +187,11 @@ public class Board : MonoBehaviour
             else if (attempts == 1) {
                 light2.SetActive(false);
             } 
-            else if (attempts == 0) {
+            else if (attempts == 0 && combo != 0) {
                 // GAME OVER / RESET COMBO
                 light3.SetActive(false);
                 combo = 0;    
                 attempts = 3;
-                light1.SetActive(true);
-                light2.SetActive(true);
-                light3.SetActive(true);            
             }
         }
 

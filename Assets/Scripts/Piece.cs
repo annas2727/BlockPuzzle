@@ -16,41 +16,46 @@ public class Piece : MonoBehaviour
     }
 
    public void Initialize(Board board, Vector3Int position, PuzzleShapeData data)
-   {
-        this.data = data;
-        this.board = board;
-        this.position = position;
+{
+    this.data = data;
+    this.board = board;
+    this.position = position;
 
-        foreach (Transform child in transform) { //clear old blocks
-            Destroy(child.gameObject);
+    foreach (Transform child in transform) { 
+        Destroy(child.gameObject);
+    }
+
+    cells = new Vector3Int[data.cells.Length];
+    
+    Quaternion rotation = transform.rotation;
+
+    for (int i = 0; i < data.cells.Length; i++)
+    {
+        Vector3 localPos = new Vector3(data.cells[i].x, data.cells[i].y, 0);
+
+        GameObject blockObject = new GameObject("PieceBlock");
+        blockObject.transform.SetParent(this.transform);
+        blockObject.transform.localPosition = localPos;
+
+        blockObject.transform.rotation = Quaternion.identity; 
+
+        SpriteRenderer sr = blockObject.AddComponent<SpriteRenderer>();
+        if (data.tile != null) {
+            sr.sprite = data.tile.sprite;
+        }
+        sr.sortingOrder = 10;
+
+        Vector3 rotatedPoint = rotation * localPos;
+        cells[i] = new Vector3Int(
+                Mathf.RoundToInt(rotatedPoint.x),
+                Mathf.RoundToInt(rotatedPoint.y),
+                0
+            );
         }
 
-        cells = new Vector3Int[data.cells.Length];
-        
-        for (int i = 0; i < data.cells.Length; i++)
-        {
-            cells[i] = (Vector3Int)data.cells[i];
-
-            GameObject blockObject = new GameObject("PieceBlock");
-            blockObject.transform.SetParent(this.transform);
-            
-            // Position the block relative to the parent Piece
-            blockObject.transform.localPosition = new Vector3(data.cells[i].x, data.cells[i].y, 0);
-
-            // Add the SpriteRenderer and assign the sprite from the Tile
-            SpriteRenderer sr = blockObject.AddComponent<SpriteRenderer>();
-            if (data.tile != null) {
-                sr.sprite = data.tile.sprite; // Uses the sprite assigned to your Tile asset
-            }
-            
-            sr.sortingOrder = 10; //appears in front
-        }
-
-        // move piece to spawn point
         transform.position = board.tilemap.CellToWorld(position) + board.tilemap.tileAnchor;
         gameObject.SetActive(true);
     }
-
    private void Update()
     {
         // Check if the screen was touched or mouse was clicked
