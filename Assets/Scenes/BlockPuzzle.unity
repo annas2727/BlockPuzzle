@@ -869,12 +869,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Board
   tileSprites:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 6937817954938267909, guid: 942378fb7f85ecf4da33db38dc02b9f3, type: 3}
+  - {fileID: 3465286685962602723, guid: cfd5e61ce5d59904e93ed2af6b78b3d3, type: 3}
+  - {fileID: -6470460504253458178, guid: bc0260045739d5b46937534c12aed832, type: 3}
+  - {fileID: -4178046375966092550, guid: da015a8ef1732684bbd6dc6728f7dd24, type: 3}
+  - {fileID: 4130640169021434097, guid: 3dfc9e322399d39498ea01e5e9374b4e, type: 3}
+  - {fileID: 4093480436322176185, guid: 4c3aa19f919186f478f734b7c9c95bb0, type: 3}
   piecePrefab: {fileID: 8262568706411486331, guid: 97c3a4f5b2e8f554dad401be7e4d1414, type: 3}
   puzzleShapeData:
   - shape: 0

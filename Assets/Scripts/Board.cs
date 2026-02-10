@@ -14,7 +14,6 @@ add animations (combo), make text bigger
 shadows
 apply for unity research position
 create themes
-add sprites to code
 */
 
 public class Board : MonoBehaviour
@@ -30,9 +29,9 @@ public class Board : MonoBehaviour
     GameObject light3;
     public Tilemap tilemap { get; set; }
     bool[,] isOccupied = new bool[8, 8];
-    public Sprite[] tileSprites = new Sprite[6];
+    public Sprite[] tileSprites = new Sprite[5];
 
-[Header("References")]
+    [Header("References")]
     public Piece piecePrefab; 
     private Piece activeInstance;
     public PuzzleShapeData[] puzzleShapeData;
@@ -71,8 +70,7 @@ public class Board : MonoBehaviour
 
     private void Awake()
     {
-        tilemap = GetComponentInChildren<Tilemap>();
-        
+        tilemap = GetComponentInChildren<Tilemap>();        
         for (int i = 0; i < puzzleShapeData.Length; i++) {
             puzzleShapeData[i].Initialize();
         }

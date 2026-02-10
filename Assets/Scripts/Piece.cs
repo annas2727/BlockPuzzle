@@ -3,18 +3,21 @@ using UnityEngine.InputSystem;
 public class Piece : MonoBehaviour
 {
     public Board board { get; private set; }
+    public ShadowBoard shadowBoard { get; private set; }
     public PuzzleShapeData data { get; private set; }
     public Vector3Int position { get; private set; }   
     public Vector3Int spawnPosition {get; set; }
     public Vector3Int[] cells { get; private set; }
     public Sprite pieceSprite { get; private set; }
     public Vector3 dragOffset;
-    private Camera mainCamera;
-    private bool isDragging = false;
+    Camera mainCamera;
+    bool isDragging = false;
+    Vector3Int lastShadowPos;
 
     private void Awake()
     {
         mainCamera = Camera.main;
+        shadowBoard = Object.FindFirstObjectByType<ShadowBoard>();
     }
 
    public void Initialize(Board board, Vector3Int position, PuzzleShapeData data, Sprite randomSprite)
@@ -93,11 +96,24 @@ public class Piece : MonoBehaviour
     private void HandleInputMove()
     {
         transform.position = (Vector3)GetMouseWorldPosition() + dragOffset;
+        Vector3Int currentGridPos = board.tilemap.WorldToCell(transform.position);
+
+        if (currentGridPos != lastShadowPos)
+        {
+            shadowBoard.Clear(this, lastShadowPos);
+            lastShadowPos = currentGridPos;
+
+            if (board.IsValidPlacement(this, currentGridPos))
+            {
+                shadowBoard.Set(this, currentGridPos);
+            }
+        }
     }
 
     private void HandleInputEnd()
     {
         isDragging = false;
+        shadowBoard.Clear(this, lastShadowPos);
         Vector3Int droppedGridPos = board.tilemap.WorldToCell(transform.position);
         
         if (board.IsValidPlacement(this, droppedGridPos)) {
@@ -106,6 +122,7 @@ public class Piece : MonoBehaviour
         } else {
             transform.position = board.tilemap.CellToWorld(spawnPosition) + board.tilemap.tileAnchor;
         }
+        lastShadowPos = new Vector3Int(100,100,100);
     }
 
     private Vector3 GetMouseWorldPosition()
