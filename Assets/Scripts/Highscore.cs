@@ -3,16 +3,34 @@ using System.IO;
 
 public class Highscore : MonoBehaviour
 {
+    public string filename;
+    public string path;
+    public int highscore = 0;
     void Start()
     {
-        WriteStringToFile("Hello, World!\nThis is a new line of text.", "highscore.txt");
+        filename = "highscore.txt";
+        path = Path.Combine(Application.persistentDataPath, filename);
+        highscore = ReadHighscore();
     }
 
-    public void WriteStringToFile(string content, string fileName)
+    public void WriteHighscore(int score)
     {
-        string path = Path.Combine(Application.persistentDataPath, fileName);
-
-        File.WriteAllText(path, content);
+        File.WriteAllText(path, score.ToString());
         Debug.Log("Wrote to file: " + path);
+    }
+
+    public int ReadHighscore()
+    {
+        Debug.Log(path);
+        if (File.Exists(path))
+        {
+            string content = File.ReadAllText(path);
+            Debug.Log(content);
+            if (int.TryParse(content, out int savedScore))
+            {
+                return savedScore;
+            }
+        }
+        return 0;
     }
 }

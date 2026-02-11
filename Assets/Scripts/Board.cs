@@ -11,9 +11,8 @@ connect home screen
 sound effects?
 expand touch boundary on pieces
 add animations (combo), make text bigger
-shadows
-apply for unity research position
 create themes
+highscore
 */
 
 public class Board : MonoBehaviour
@@ -24,6 +23,7 @@ public class Board : MonoBehaviour
     Text scoreText;
     Text comboText;
     Text scorePopupText;
+    Text highscoreText;
     GameObject light1;
     GameObject light2;
     GameObject light3;
@@ -34,6 +34,7 @@ public class Board : MonoBehaviour
     [Header("References")]
     public Piece piecePrefab; 
     private Piece activeInstance;
+    public Highscore highscoreSystem;
     public PuzzleShapeData[] puzzleShapeData;
 
     [Header("Settings")]
@@ -61,6 +62,9 @@ public class Board : MonoBehaviour
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
         scorePopupText = GameObject.Find("ScorePopupText").GetComponent<Text>();
         scorePopupText.gameObject.SetActive(false);
+
+        highscoreText = GameObject.Find("HighscoreText").GetComponent<Text>();
+        highscoreText.text = highscoreSystem.highscore.ToString();
         
         SpawnPiece(spawnPosition1);
         SpawnPiece(spawnPosition2);
@@ -80,8 +84,8 @@ public class Board : MonoBehaviour
     {
         activeInstance = Instantiate(piecePrefab);
     
-        int randomShape = Random.Range(0, this.puzzleShapeData.Length);
-        PuzzleShapeData data = this.puzzleShapeData[randomShape];  
+        int randomShape = Random.Range(0, puzzleShapeData.Length);
+        PuzzleShapeData data = puzzleShapeData[randomShape];  
                 
         Sprite selectedSprite = tileSprites[Random.Range(0, tileSprites.Length)];
         
@@ -336,6 +340,11 @@ public class Board : MonoBehaviour
 
     public void GameOver()
     {
+        if (score > highscoreSystem.highscore)
+        {
+            highscoreSystem.WriteHighscore(score);
+            highscoreText.text = score.ToString();
+        }
         Debug.Log ("game over");
     }
 }
