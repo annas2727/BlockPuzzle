@@ -29,7 +29,7 @@ public class Board : MonoBehaviour
     GameObject light3;
     public Tilemap tilemap { get; set; }
     bool[,] isOccupied = new bool[8, 8];
-    public Sprite[] tileSprites = new Sprite[5];
+    public Sprite[] tileSprites = new Sprite[4];
 
     [Header("References")]
     public Piece piecePrefab; 
@@ -83,7 +83,7 @@ public class Board : MonoBehaviour
         int randomShape = Random.Range(0, this.puzzleShapeData.Length);
         PuzzleShapeData data = this.puzzleShapeData[randomShape];  
                 
-        Sprite selectedSprite = tileSprites[Random.Range(0, tileSprites.Length-1)];
+        Sprite selectedSprite = tileSprites[Random.Range(0, tileSprites.Length)];
         
         int[] angles = { 0, 90, 180, 270 };
         int randomRotation = angles[Random.Range(0, angles.Length)];
@@ -104,7 +104,12 @@ public class Board : MonoBehaviour
             newTile.color = Color.white;
 
             tilemap.SetTile(tilePosition, newTile);
-            isOccupied[tilePosition.x + boardSize.x/2, tilePosition.y + boardSize.y/2] = true;
+
+            int x = tilePosition.x + boardSize.x / 2;
+            int y = tilePosition.y + boardSize.y / 2;
+            if (x >= 0 && x < 8 && y >= 0 && y < 8) {
+                isOccupied[x, y] = true;
+            }
         }
 
         int linesCleared = ProcessLines();
@@ -114,6 +119,8 @@ public class Board : MonoBehaviour
         activeInstance = null;
         piecesOnBoard--;
 
+        CheckAllPiecesFit();
+
         if (piecesOnBoard == 0)
         {
             SpawnPiece(spawnPosition1);
@@ -121,31 +128,74 @@ public class Board : MonoBehaviour
             SpawnPiece(spawnPosition3);
             piecesOnBoard = 3;
         }
+        CheckAllPiecesFit();
     }
 
     public bool IsValidPlacement(Piece piece, Vector3Int position)
     {
         foreach (Vector3Int cell in piece.cells) 
         {
-            Vector3Int tilePosition = cell + position + boardSize/2;
-            
-            //checks if it in bounds of board
-            bool inX = tilePosition.x >= boardOrigin.x && tilePosition.x < boardOrigin.x + boardSize.x;
-            bool inY = tilePosition.y >= boardOrigin.y && tilePosition.y < boardOrigin.y + boardSize.y;
+            Vector3Int gridPos = cell + position;
 
-            if (!inX || !inY) {
-                Debug.Log($"FAILED BOUNDS: Tile {tilePosition} is outside X({boardOrigin.x} to {boardOrigin.x + boardSize.x}) or Y({boardOrigin.y} to {boardOrigin.y + boardSize.y})");
+            int x = gridPos.x + boardSize.x / 2;
+            int y = gridPos.y + boardSize.y / 2;
+
+            if (x < 0 || x >= boardSize.x || y < 0 || y >= boardSize.y) {
+                return false; 
+            }
+
+            if (isOccupied[x, y]) {
                 return false;
             }
-            
-            if (isOccupied[tilePosition.x, tilePosition.y]) {
-                Debug.Log("failed placement - overlap");
-                return false;
-            }
-            Debug.Log("Placement is VALID");
-
         }
         return true;
+    }
+
+    public bool CanFitOnBoard(Piece piece) //checks each piece
+    {
+        for (int x = -boardSize.x/2; x < boardSize.x/2; x++)
+        {
+            for (int y = -boardSize.y/2; y < boardSize.y/2; y++)
+            {
+                if (IsValidPlacement(piece, new Vector3Int(x,y,0)))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void CheckAllPiecesFit() //checks that 3 spawned pieces fit
+    {
+        // Find all active pieces in the scene
+        Piece[] allPieces = Object.FindObjectsByType<Piece>(FindObjectsSortMode.None);
+        int validActivePieces = piecesOnBoard;
+
+        foreach (Piece p in allPieces)
+        {
+            if (CanFitOnBoard(p))
+            {
+                p.SetAlpha(1.0f); // Looks normal
+            }
+            else
+            {
+                p.SetAlpha(0.5f); // Grays out
+                p.canBeMoved = false;
+            }
+
+            if (!p.canBeMoved)
+            {
+                validActivePieces--;
+            }
+        }
+
+        Debug.Log("vap " + validActivePieces + "len: " + allPieces.Length);
+        if ((validActivePieces == 0) && (allPieces.Length > 1))
+        {
+            GameOver();
+        }
+        
     }
 
     public bool IsRowFull(int y)
@@ -223,8 +273,6 @@ public class Board : MonoBehaviour
             CancelInvoke("HidePopup");
             Invoke("HidePopup", 1.0f);
         }
-
-       
     }
 
     public void UpdateComboLights(int linesCleared, Vector3Int tilePosition)
@@ -256,7 +304,6 @@ public class Board : MonoBehaviour
                 attempts = 3;
             }
         }
-
         comboText.text = "Combo: \nx" + combo;
 
     }
@@ -285,5 +332,10 @@ public class Board : MonoBehaviour
         light1.SetActive(true);
         light2.SetActive(true);
         light3.SetActive(true);
+    }
+
+    public void GameOver()
+    {
+        Debug.Log ("game over");
     }
 }

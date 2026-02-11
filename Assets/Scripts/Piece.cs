@@ -12,6 +12,7 @@ public class Piece : MonoBehaviour
     public Vector3 dragOffset;
     Camera mainCamera;
     bool isDragging = false;
+    public bool canBeMoved = true;
     Vector3Int lastShadowPos;
 
     private void Awake()
@@ -87,6 +88,10 @@ public class Piece : MonoBehaviour
         Vector2 mousePos = GetMouseWorldPosition();
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
+        if (!canBeMoved) {
+            return;
+        }
+
         if (hit.collider != null && hit.collider.gameObject == gameObject) {
             isDragging = true;
             dragOffset = transform.position - (Vector3)mousePos;
@@ -102,7 +107,6 @@ public class Piece : MonoBehaviour
         {
             shadowBoard.Clear(this, lastShadowPos);
             lastShadowPos = currentGridPos;
-
             if (board.IsValidPlacement(this, currentGridPos))
             {
                 shadowBoard.Set(this, currentGridPos);
@@ -131,6 +135,21 @@ public class Piece : MonoBehaviour
         Vector3 mouseScreenPosition = new Vector3(mousePos.x, mousePos.y, mainCamera.WorldToScreenPoint(transform.position).z);
         
         return mainCamera.ScreenToWorldPoint(mouseScreenPosition);
+    }
+
+    public void SetAlpha(float alpha)
+    {
+        // Loop through every child block we created
+        foreach (Transform child in transform)
+        {
+            SpriteRenderer sr = child.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                Color c = sr.color;
+                c.a = alpha; // Set transparency (0.5f is half-transparent)
+                sr.color = c;
+            }
+        }
     }
 
 }
