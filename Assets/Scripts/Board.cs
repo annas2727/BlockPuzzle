@@ -4,7 +4,6 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 /* TO DO 
-gray out if pieces dont fit
 piece weights
 background music 
 connect home screen
@@ -12,7 +11,6 @@ sound effects?
 expand touch boundary on pieces
 add animations (combo), make text bigger
 create themes
-highscore
 */
 
 public class Board : MonoBehaviour
@@ -23,10 +21,12 @@ public class Board : MonoBehaviour
     Text scoreText;
     Text comboText;
     Text scorePopupText;
+    Text finalScoreText;
     Text highscoreText;
     GameObject light1;
     GameObject light2;
     GameObject light3;
+    GameObject gameOverWindow;
     public Tilemap tilemap { get; set; }
     bool[,] isOccupied = new bool[8, 8];
     public Sprite[] tileSprites = new Sprite[4];
@@ -49,7 +49,6 @@ public class Board : MonoBehaviour
 
     private void Start()
     {
-
         light1 = GameObject.Find("Light1On");
         light2 = GameObject.Find("Light2On");
         light3 = GameObject.Find("Light3On");
@@ -60,11 +59,15 @@ public class Board : MonoBehaviour
 
         scoreText = GameObject.Find("ScoreText").GetComponent<Text>();
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
+        finalScoreText = GameObject.Find("FinalScoreText").GetComponent<Text>();
         scorePopupText = GameObject.Find("ScorePopupText").GetComponent<Text>();
         scorePopupText.gameObject.SetActive(false);
 
         highscoreText = GameObject.Find("HighscoreText").GetComponent<Text>();
         highscoreText.text = highscoreSystem.highscore.ToString();
+
+        gameOverWindow = GameObject.Find("GameOver");
+        gameOverWindow.SetActive(false);
         
         SpawnPiece(spawnPosition1);
         SpawnPiece(spawnPosition2);
@@ -194,7 +197,6 @@ public class Board : MonoBehaviour
             }
         }
 
-        Debug.Log("vap " + validActivePieces + "len: " + allPieces.Length);
         if ((validActivePieces == 0) && (allPieces.Length > 1))
         {
             GameOver();
@@ -340,11 +342,13 @@ public class Board : MonoBehaviour
 
     public void GameOver()
     {
+        gameOverWindow.SetActive(true);
         if (score > highscoreSystem.highscore)
         {
             highscoreSystem.WriteHighscore(score);
             highscoreText.text = score.ToString();
         }
+        finalScoreText.text = "Score: " + score.ToString();
         Debug.Log ("game over");
     }
 }
