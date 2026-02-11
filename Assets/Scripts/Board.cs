@@ -187,7 +187,7 @@ public class Board : MonoBehaviour
             }
             else
             {
-                p.SetAlpha(0.5f); // Grays out
+                p.SetAlpha(0.2f); // Grays out
                 p.canBeMoved = false;
             }
 
@@ -265,12 +265,9 @@ public class Board : MonoBehaviour
         UpdateComboLights(linesCleared, position);
         int turnScore = (combo * linesCleared * boardSize.x) + tileScore;
         score += turnScore;
-        Debug.Log("turn score: " + turnScore);
 
         Vector3 worldPos = tilemap.CellToWorld(position);
         Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
-
-        scoreText.text = "Score: " + score;
         
         if (turnScore > 0) {
             scorePopupText.gameObject.SetActive(true);
@@ -349,6 +346,5 @@ public class Board : MonoBehaviour
             highscoreText.text = score.ToString();
         }
         finalScoreText.text = "Score: " + score.ToString();
-        Debug.Log ("game over");
     }
 }

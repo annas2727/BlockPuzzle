@@ -52,6 +52,11 @@ public class Piece : MonoBehaviour
         sr.sprite = randomSprite;
 
         sr.sortingOrder = 10;
+        BoxCollider2D collider = blockObject.AddComponent<BoxCollider2D>();
+        collider.size = new Vector2(1, 1); 
+        
+        blockObject.layer = gameObject.layer;
+
 
         Vector3 rotatedPoint = rotation * localPos;
         cells[i] = new Vector3Int(
@@ -88,11 +93,16 @@ public class Piece : MonoBehaviour
         Vector2 mousePos = GetMouseWorldPosition();
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
+        if (hit.collider == null) {
+            return; 
+        }
+
         if (!canBeMoved) {
             return;
         }
 
-        if (hit.collider != null && hit.collider.gameObject == gameObject) {
+        if (hit.collider.gameObject == gameObject || hit.collider.transform.parent == transform) 
+        {            
             isDragging = true;
             dragOffset = transform.position - (Vector3)mousePos;
         }
