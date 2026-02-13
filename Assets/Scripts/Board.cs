@@ -249,8 +249,18 @@ public class Board : MonoBehaviour
                 Vector3Int cellPosition = new Vector3Int(x, y, 0);
                 
                 //get color from tilemap
-                TileBase tile = tilemap.GetTile(cellPosition);
-                Color color = tilemap.GetColor(cellPosition);
+                TileBase tileBase = tilemap.GetTile(cellPosition);
+                Color color = Color.white;
+
+                Tile tile = tileBase as Tile;
+                Texture2D tex = tile.sprite.texture;
+
+                Rect rect = tile.sprite.textureRect;
+
+                int px = Mathf.FloorToInt(rect.x + rect.width / 2);
+                int py = Mathf.FloorToInt(rect.y + rect.height / 2);
+
+                color = tex.GetPixel(px, py);
 
                 Vector3 worldPos = tilemap.GetCellCenterWorld(cellPosition);
 
@@ -258,8 +268,8 @@ public class Board : MonoBehaviour
                 GameObject particleObj = Instantiate(particlePrefab, cellPosition, Quaternion.identity);
 
                 ParticleSystem ps = particleObj.GetComponent<ParticleSystem>();
-                //var main = ps.main;
-                //main.startColor = color;
+                var main = ps.main;
+                main.startColor = color;
 
                 Debug.Log ("Vector pos: " + cellPosition); 
                 Debug.Log("(" + x + " ," + y + ")");
