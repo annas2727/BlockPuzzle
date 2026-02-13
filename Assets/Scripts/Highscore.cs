@@ -16,7 +16,6 @@ public class Highscore : MonoBehaviour
     public void WriteHighscore(int score)
     {
         File.WriteAllText(path, score.ToString());
-        Debug.Log("Wrote to file: " + path);
     }
 
     public int ReadHighscore()

@@ -8,8 +8,7 @@ piece weights
 background music 
 connect home screen
 sound effects?
-expand touch boundary on pieces
-add animations (combo), make text bigger
+ add animations (combo), make text bigger
 create themes
 */
 
@@ -30,6 +29,8 @@ public class Board : MonoBehaviour
     public Tilemap tilemap { get; set; }
     bool[,] isOccupied = new bool[8, 8];
     public Sprite[] tileSprites = new Sprite[4];
+
+    public GameObject particlePrefab;
 
     [Header("References")]
     public Piece piecePrefab; 
@@ -245,6 +246,26 @@ public class Board : MonoBehaviour
         //clear rows
         foreach (int y in fullRows) {
             for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
+                Vector3Int cellPosition = new Vector3Int(x, y, 0);
+                
+                //get color from tilemap
+                TileBase tile = tilemap.GetTile(cellPosition);
+                Color color = tilemap.GetColor(cellPosition);
+
+                Vector3 worldPos = tilemap.GetCellCenterWorld(cellPosition);
+
+                //create particle system
+                GameObject particleObj = Instantiate(particlePrefab, cellPosition, Quaternion.identity);
+
+                ParticleSystem ps = particleObj.GetComponent<ParticleSystem>();
+                //var main = ps.main;
+                //main.startColor = color;
+
+                Debug.Log ("Vector pos: " + cellPosition); 
+                Debug.Log("(" + x + " ," + y + ")");
+
+                Destroy(particleObj, 2f);
+
                 tilemap.SetTile(new Vector3Int(x, y, 0), null);
                 isOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
             }
@@ -275,6 +296,7 @@ public class Board : MonoBehaviour
             scorePopupText.transform.position = screenPos;
             CancelInvoke("HidePopup");
             Invoke("HidePopup", 1.0f);
+            scoreText.text = "Score: " + score.ToString();
         }
     }
 

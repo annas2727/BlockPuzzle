@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 95da3b45d84ba2c4d8582b27b275768e
+guid: faf3e593ac37b044ab3731613978ad79
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8572043569924737516
-    second: RestartButton_0
+      213: -400355983376763157
+    second: RestartButton 1_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,7 +113,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: RestartButton_0
+      name: RestartButton 1_0
       rect:
         serializedVersion: 2
         x: 1038
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ce90980d53406f670800000000000000
-      internalID: 8572043569924737516
+      spriteID: be63023ba56a17af0800000000000000
+      internalID: -400355983376763157
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      RestartButton_0: 8572043569924737516
+      RestartButton 1_0: -400355983376763157
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
