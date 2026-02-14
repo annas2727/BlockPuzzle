@@ -27,7 +27,7 @@ public class Board : MonoBehaviour
     GameObject light3;
     GameObject gameOverWindow;
     public Tilemap tilemap { get; set; }
-    bool[,] isOccupied = new bool[8, 8];
+
     public Sprite[] tileSprites = new Sprite[4];
 
     public GameObject particlePrefab;
@@ -47,6 +47,15 @@ public class Board : MonoBehaviour
     [Header("Board Dimensions")]
     public Vector3Int boardSize = new Vector3Int(8, 8, 0);
     public Vector3Int boardOrigin = new Vector3Int(0,0,0);
+
+    bool[,] isOccupied = new bool[8, 8];
+    public Color32[] tileColors = {
+        new Color32(54, 91, 109, 255),
+        new Color32(51, 129, 165, 255),
+        new Color32(108, 146, 134, 255),
+        new Color32(65, 193, 186, 255),
+        new Color32(167, 239, 241, 255)
+    };
 
     private void Start()
     {
@@ -73,6 +82,7 @@ public class Board : MonoBehaviour
         SpawnPiece(spawnPosition1);
         SpawnPiece(spawnPosition2);
         SpawnPiece(spawnPosition3);
+
     }
 
 
@@ -232,6 +242,7 @@ public class Board : MonoBehaviour
     {
         List<int> fullRows = new List<int>();
         List<int> fullCols = new List<int>();
+        HashSet<Vector3Int> cellsToClear = new HashSet<Vector3Int>();
 
         //get rows
         for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
@@ -246,49 +257,58 @@ public class Board : MonoBehaviour
         //clear rows
         foreach (int y in fullRows) {
             for (int x = boardOrigin.x - boardSize.x/2; x < boardOrigin.x + boardSize.x/2; x++) {
-                Vector3Int cellPosition = new Vector3Int(x, y, 0);
-                
-                //get color from tilemap
-                TileBase tileBase = tilemap.GetTile(cellPosition);
-                Color color = Color.white;
-
-                Tile tile = tileBase as Tile;
-                Texture2D tex = tile.sprite.texture;
-
-                Rect rect = tile.sprite.textureRect;
-
-                int px = Mathf.FloorToInt(rect.x + rect.width / 2);
-                int py = Mathf.FloorToInt(rect.y + rect.height / 2);
-
-                color = tex.GetPixel(px, py);
-
-                Vector3 worldPos = tilemap.GetCellCenterWorld(cellPosition);
-
-                //create particle system
-                GameObject particleObj = Instantiate(particlePrefab, cellPosition, Quaternion.identity);
-
-                ParticleSystem ps = particleObj.GetComponent<ParticleSystem>();
-                var main = ps.main;
-                main.startColor = color;
-
-                Debug.Log ("Vector pos: " + cellPosition); 
-                Debug.Log("(" + x + " ," + y + ")");
-
-                Destroy(particleObj, 2f);
-
-                tilemap.SetTile(new Vector3Int(x, y, 0), null);
-                isOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
+                cellsToClear.Add(new Vector3Int(x,y,0));
             }
         }
 
         //clear columns
         foreach (int x in fullCols) {
-            for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++) {
-                tilemap.SetTile(new Vector3Int(x, y, 0), null);
-                isOccupied[x + boardSize.x/2, y + boardSize.y/2] = false;
+            for (int y = boardOrigin.y - boardSize.y/2; y < boardOrigin.y + boardSize.y/2; y++)
+            {
+                cellsToClear.Add(new Vector3Int(x,y,0));
             }
         }
-        return fullRows.Count + fullCols.Count; 
+
+        foreach (Vector3Int cellPosition in cellsToClear)
+        {
+            int x = cellPosition.x + boardSize.x/2;
+            int y = cellPosition.y + boardSize.y/2;
+            
+            Vector3 worldPos = tilemap.GetCellCenterWorld(cellPosition);
+
+            TileBase tileBase = tilemap.GetTile(cellPosition);
+
+            Tile tile = tileBase as Tile;
+            string spriteName = tile.sprite.name;
+
+            Color color = Color.white;
+
+            if (spriteName == "2_0")
+                color = tileColors[0];
+            else if (spriteName == "3_0")
+                color = tileColors[1];
+            else if (spriteName == "4_0")
+                color = tileColors[2];
+            else if (spriteName == "5_0")
+                color = tileColors[3];
+            else if (spriteName == "6_0")
+                color = tileColors[4];
+
+            //create particle system
+            GameObject particleObj = Instantiate(particlePrefab, worldPos, Quaternion.identity);
+
+                //set color of sprite
+            ParticleSystem ps = particleObj.GetComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startColor = color;
+
+            Destroy(particleObj, 3f);
+            
+            isOccupied[x, y] = false;
+            tilemap.SetTile(new Vector3Int(x - boardSize.x/2, y - boardSize.y/2, 0), null);
+            Debug.Log (x  + " " + y);
+        }
+        return fullCols.Count + fullRows.Count;
     }
 
     public void UpdateScore(int tileScore, int linesCleared, Vector3Int position)
